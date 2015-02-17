@@ -1,0 +1,5 @@
+#Web requirements
+Django==1.7.4
+django-pipeline==1.4.6
+
+#Application requirements
