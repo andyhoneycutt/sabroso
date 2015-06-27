@@ -14,7 +14,7 @@ from collections import namedtuple
 CommonPersistence = namedtuple(
     'CommonPersistence',
     [
-        "project",
+        "type",
         "data",
         "hash",
         "tags",

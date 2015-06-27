@@ -20,7 +20,7 @@ class TestCommonPersistence(unittest.TestCase):
         """
         Set up tests.
         """
-        self.project_name = "test_project"
+        self.type = "type"
         self.data = "data"
         self.hash = "AAAA!!!!"
         self.tags = {
@@ -32,7 +32,7 @@ class TestCommonPersistence(unittest.TestCase):
             "link2"
         ]
         self.test_model = CommonPersistence(
-            project = self.project_name,
+            type = self.type,
             data = self.data,
             hash = self.hash,
             tags = self.tags,
@@ -44,8 +44,8 @@ class TestCommonPersistence(unittest.TestCase):
         Test that model is created correctly.
         """
         self.assertEqual(
-            self.test_model.project,
-            self.project_name)
+            self.test_model.type,
+            self.type)
         self.assertEqual(
             self.test_model.hash,
             self.hash)

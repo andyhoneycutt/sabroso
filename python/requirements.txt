@@ -1,7 +1,4 @@
 #Web requirements
-Django==1.8
-django-pipeline==1.4.7
-#django-mongodb-engine==0.5.1
 
 #Application requirements
 numpy==1.9.1
