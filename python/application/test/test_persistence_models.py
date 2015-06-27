@@ -1,7 +1,8 @@
 """
-test_persistence_models.py
+test_common_model.py
 
-This module contains tests for models.persistence.
+This module contains tests for the data layer
+common model.
 
 """
 
@@ -11,8 +12,8 @@ __author__ = 'Alan Barber'
 import unittest
 
 #app
-from application.models.persistence import (
-    CommonPersistence)
+from application.data_layer.models.common import (
+    Common)
 
 class TestCommonPersistence(unittest.TestCase):
 
@@ -31,7 +32,7 @@ class TestCommonPersistence(unittest.TestCase):
             "link1",
             "link2"
         ]
-        self.test_model = CommonPersistence(
+        self.test_model = Common(
             type = self.type,
             data = self.data,
             hash = self.hash,
