@@ -11,8 +11,8 @@ __author__ = 'Alan Barber'
 #python
 from collections import namedtuple
 
-CommonPersistence = namedtuple(
-    'CommonPersistence',
+Common = namedtuple(
+    'Common',
     [
         "type",
         "data",

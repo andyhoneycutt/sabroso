@@ -4,4 +4,4 @@
 numpy==1.9.1
 scipy==0.15.1
 pandas==0.16.0
-pymongo==2.8
+pymongo==3.0.2
