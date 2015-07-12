@@ -47,7 +47,7 @@ def bad_request(error):
 
 """ Convert data into json format for api presentation """
 def toJson(data):
-    return json.dumps(cursor_data, default=json_util.default)
+    return json.dumps(data, default=json_util.default)
 
 if __name__ == '__main__':
     app.run(debug=True)
