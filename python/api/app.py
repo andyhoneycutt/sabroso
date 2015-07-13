@@ -1,31 +1,28 @@
 #!flask/bin/python
 from flask import Flask, abort, make_response
 from pymongo import MongoClient
-import json
-from bson import json_util
+import json, bson
+from bson import json_util, errors
 from bson.objectid import ObjectId
+from settings import db
 
 app = Flask(__name__)
 
-""" Try to get a connection to MongoDB, or fail out """
-try:
-    db = MongoClient('localhost')
-except pymongo.errors.ConnectionFailure:
-    exit("Could not connect to MongoDB is it running?")
-
 """ Get a list of projects """
-@app.route('/api/v1.0/projects', methods=['GET'])
+@app.route('/api/v1.0/projects/', methods=['GET'])
 def get_projects():
-    projects = [project for project in db.sabroso.projects.find()]
+    projects = [project for project in db.projects.find()]
     return toJson(projects)
 
 """ Get a single project by _id """
-@app.route('/api/v1.0/projects/<_id>', methods=['GET'])
+@app.route('/api/v1.0/projects/<path:_id>', methods=['GET'])
 def get_project(_id):
     if not _id:
         abort(404)
-
-    project = db.sabroso.projects.find_one({"_id" : ObjectId(_id)})
+    try:
+        project = db.projects.find_one({"_id" : ObjectId(_id)})
+    except bson.errors.InvalidId:
+        abort(400)
     return toJson(project)
 
 """ Put a project """
