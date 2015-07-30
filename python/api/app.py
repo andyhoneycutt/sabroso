@@ -9,26 +9,17 @@ with a common data handler. Please, sweet baby jesus, do this
 soon.
 """
 
-from flask import Flask, abort, make_response, g
+from flask import Flask, abort, make_response, g, request
 from bson import json_util, errors
 from bson.objectid import ObjectId
 import pymongo
 import json
 import bson
 
-"""
-Configure the below for current api version as
-all requests must be directed to app_endpoint/<whatever>
-e.g. '/api/v1.0/projects/abcd1234', this handles the
-/api/v1.0 part of uri access
-"""
-base_endpoint = '/api'
-version = 'v1.0'
-url = '/'
-app_endpoint = url.join([base_endpoint, version])
-
 app = Flask(__name__)
-app.config.from_object('settings.DefaultSettings')
+#app.config.from_object('settings.DefaultSettings')
+app.config.from_object('settings.DebugSettings')
+app_endpoint = app.config['APP_ENDPOINT']
 
 """ Get a list of projects """
 @app.route(app_endpoint + '/projects/', methods=['GET'])
@@ -63,10 +54,11 @@ def get_project(_id):
 
 """ Put a project """
 """ TODO: Use the ProjectAccessor for this task """
-@app.route(app_endpoint + '/projects/', methods=['POST'])
+@app.route(app_endpoint + '/projects/', methods=['POST','PUT'])
 def put_project():
     if not 'name' in request.json:
         abort(400)
+    return make_response(toJson(request.json), 201)
 
 """ Make the 404 handler spit out JSON instead of html """
 @app.errorhandler(404)
@@ -120,4 +112,4 @@ def connectToMongoDb():
     return db
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=app.config['DEBUG'], port=app.config['PORT'])
