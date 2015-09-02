@@ -16,8 +16,6 @@ class Proto(object):
             if bson.objectid.ObjectId.is_valid(id):
                 self._id = ObjectId(id)
 
-        self.data = self.Get()
-
     def _typeName(self):
         return self.__class__.__name__
 
@@ -31,6 +29,29 @@ class Proto(object):
         if type(self._id) is bson.objectid.ObjectId:
             return str(self._id)
         return self._id
+
+    def Create(self, **kwargs):
+        if self.session is None:
+            print(self._documentName() + " has no session")
+            return False
+
+        data = {}
+        for k, v in kwargs.items():
+            data[k] = v
+
+        if type(self.session) is pymongo.database.Database:
+            db = self.session
+
+            try:
+                result = db[self._documentName()].insert_one(data)
+                self._id = result.inserted_id
+            except:
+                print("Could not insert " + self._documentName() + " with data " + vars(data))
+                return False
+
+            return True
+
+        return False
 
     def Get(self):
         data = []
@@ -55,7 +76,6 @@ class Proto(object):
                 data = db[self._documentName()].find_one(do_search)
                 if data is not None and self._id is None:
                     self._id = ObjectId(data['_id'])
-
             except bson.errors.InvalidId:
                 print(self.getId() + " is not a valid ObjectId")
 

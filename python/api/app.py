@@ -11,11 +11,12 @@ soon.
 from flask import Flask, abort, make_response, g, request
 from bson import json_util, errors
 from bson.objectid import ObjectId
+from models.proto import Proto
+from models.project import Project
 import pymongo
 import json
 import bson
-from models.proto import Proto
-from models.project import Project
+import datetime
 
 app = Flask(__name__)
 #app.config.from_object('settings.DefaultSettings')
@@ -57,9 +58,25 @@ def get_project(_id):
 """ TODO: Use the ProjectAccessor for this task """
 @app.route(app_endpoint + '/projects/', methods=['POST','PUT'])
 def put_project():
-    if not 'name' in request.json:
-        abort(400)
-    return make_response(toJson(request.json), 201)
+    json = request.get_json()
+
+    # Make sure we receive data in the request
+    if not request.data:
+        return make_response(toJson(json), 400)
+
+    if not 'name' in json:
+        return bad_request(toJson("name is required"))
+
+    created_on = str(datetime.datetime.now())
+    if 'created_on' in json:
+        created_on = json['created_on']
+
+    # create the project
+    project = Project(get_database())
+    if project.Create(name=json['name'], created_on=created_on) == True:
+        return make_response(toJson(project.Get()), 201)
+    else:
+        return make_response(toJson(json), 400)
 
 """ Make the 404 handler spit out JSON instead of html """
 @app.errorhandler(404)

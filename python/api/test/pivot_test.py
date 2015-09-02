@@ -6,14 +6,9 @@ from pandas.util.testing import assert_frame_equal
 import settings
 from models.project import Project
 from models.proto import Proto
+from models.registry import Registry
 
 def doPivot(pivot_config):
-
-    # Set up
-    functions = {
-        "Similarity": similarityFunc,
-        "RegisteredOne": registeredFunc
-    }
 
     # Shorthand
     filter = pivot_config['filter']
@@ -29,17 +24,18 @@ def doPivot(pivot_config):
     project_data = project.getData(filter['query'])
 
     # Convert to data frame using specified function
-    toDataframe = functions[pivot_config['toDataframe']]
+    toDataframe = Registry.r[pivot_config['toDataframe']]['f']
     project_data_to_dataframe = toDataframe(project_data)
 
     ## apply pivot functions
     for f in pivot:
         function_name = f['function']
         arguments = f['kwargs']
-        project_data_to_dataframe = functions[function_name](project_data_to_dataframe, arguments)
+        project_data_to_dataframe = Registry.r[function_name]['f'](project_data_to_dataframe, arguments)
 
     return project_data_to_dataframe
 
+@Registry.register("Similarity")
 def similarityFunc(data):
     """
     This function would create a panda from data from mongo.
@@ -60,6 +56,7 @@ def similarityFunc(data):
                 })
     return pandas.DataFrame(to_panda)
 
+@Registry.register("RegisteredOne")
 def registeredFunc(df, transform=False, **kwargs):
     """
     This is an example pivot/transforming function.
@@ -139,12 +136,15 @@ class TestPivotServiceScaffold(unittest.TestCase):
             }
         ]
 
+        #
+        # Moved to Registry
+        #
         #These would be in a registry, but here are just put into
         #a dictionary.
-        self.functions = {
-            "Similarity": similarityFunc,
-            "RegisteredOne": registeredFunc
-        }
+        # self.functions = {
+        #     "Similarity": similarityFunc,
+        #     "RegisteredOne": registeredFunc
+        # }
 
         #This is an imagined pivot configuration object.
         self.pivot_config = {
