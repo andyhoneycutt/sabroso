@@ -8,13 +8,14 @@ mongo errors being handled all over the place. Need to come up
 with a common data handler. Please, sweet baby jesus, do this
 soon.
 """
-
 from flask import Flask, abort, make_response, g, request
 from bson import json_util, errors
 from bson.objectid import ObjectId
 import pymongo
 import json
 import bson
+from models.proto import Proto
+from models.project import Project
 
 app = Flask(__name__)
 #app.config.from_object('settings.DefaultSettings')
@@ -25,7 +26,7 @@ app_endpoint = app.config['APP_ENDPOINT']
 @app.route(app_endpoint + '/projects/', methods=['GET'])
 def get_projects():
     try:
-        projects = [project for project in get_database().projects.find()]
+        projects = [project for project in get_database().project.find()]
     except (
         pymongo.errors.ServerSelectionTimeoutError,
         pymongo.errors.NetworkTimeout,
@@ -42,7 +43,7 @@ def get_project(_id):
     if not _id:
         abort(404)
     try:
-        project = get_database().projects.find_one({"_id" : ObjectId(_id)})
+        project = Project(get_database(), id = _id)
     except bson.errors.InvalidId:
         abort(400)
     except pymongo.errors.ServerSelectionTimeoutError:
@@ -50,7 +51,7 @@ def get_project(_id):
     except pymongo.errors.AutoReconnect:
         print("Had to reconnect, we can keep working")
 
-    return toJson(project)
+    return toJson(project.Get())
 
 """ Put a project """
 """ TODO: Use the ProjectAccessor for this task """
